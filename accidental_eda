@@ -1,0 +1,86 @@
+
+############### summary stats ###############
+
+# numeric
+
+
+num_vars <- df[, c("age", "absences", "G1", "G2", "G3")]
+
+summary_num <- rbind(
+  Min = sapply(num_vars, min),
+  Q1 = sapply(num_vars, function(x) quantile(x, 0.25)),
+  Median = sapply(num_vars, median),
+  Mean = sapply(num_vars, mean),
+  Q3 = sapply(num_vars, function(x) quantile(x, 0.75)),
+  Max = sapply(num_vars, max),
+  SD = sapply(num_vars, sd)
+)
+
+summary_num <- round(summary_num, 2)
+
+knitr::kable(summary_num,
+             format = "latex",
+             booktabs = TRUE,
+             caption = "Summary statistics for numeric variables") %>%
+  kableExtra::kable_styling(latex_options = "scale_down")
+
+
+# ordinal
+
+ord_vars <- c("studytime","traveltime","Medu","Fedu",
+              "famrel","freetime","goout","health","Dalc","Walc")
+
+df_long <- df[, ord_vars]
+df_long$ID <- 1:nrow(df_long)
+
+df_long <- pivot_longer(df_long, cols = -ID)
+
+df_long$name <- factor(df_long$name, levels = ord_vars)
+
+ggplot(df_long, aes(x = value)) +
+  geom_bar() +
+  facet_wrap(~ name, scales = "free_x") +
+  theme_minimal()
+
+
+# categorical
+
+cat_group1 <- c(
+  "school","sex","address","famsize","Pstatus"
+)
+
+cat_group2 <- c(
+  "Mjob","Fjob","guardian"
+)
+
+cat_group3 <- c(
+  "schoolsup","famsup","paid","activities",
+  "nursery","higher","internet","romantic","pass"
+)
+
+
+plot_cats <- function(vars, ncol = 3) {
+
+  df_long <- df[, vars]
+  df_long$ID <- 1:nrow(df_long)
+
+  df_long <- tidyr::pivot_longer(df_long, cols = -ID)
+
+  df_long$name <- factor(df_long$name, levels = vars)
+
+  ggplot(df_long, aes(x = value)) +
+    geom_bar() +
+    facet_wrap(~ name, scales = "free_x", ncol = 3) +
+    theme_minimal(base_size = 11) +
+    theme(
+      aspect.ratio = 1,
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      strip.text = element_text(size = 10),
+      panel.spacing = unit(0.2, "lines")
+    )
+
+}
+
+plot_cats(cat_group1, ncol = 2)
+plot_cats(cat_group2, ncol = 3)
+plot_cats(cat_group3, ncol = 3)

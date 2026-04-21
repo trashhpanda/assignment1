@@ -1,3 +1,8 @@
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(tidyr)
+
 ############### read data from the CSV file ###############
 
 df <- read.csv("student_performance/student/student-por.csv", sep = ";")
@@ -22,7 +27,3 @@ df[factor_vars] <- lapply(df[factor_vars], as.factor)
 df$pass <- ifelse(df$G3 >= 10, "pass", "fail")
 df$pass <- as.factor(df$pass)
 
-
-
-str(df)
-summary(df)
